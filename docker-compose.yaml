@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+    db:  # This service name will be also used as hostname for MONGODB_URI
+      image: mongo # :5.0.17
+      env_file:
+        - .env
+      ports:
+        - 27017:27017
+      volumes:
+        - ./data/mongo:/data/db
+      restart: always
+
+    backend:
+        build:
+            context: ./
+        volumes: 
+          - ./fastapp:/code/fastapp
+        depends_on:
+            - db
+        env_file:
+            - ./fastapp/.env
+        ports:
+            - ${FASTAPP_UVICORN_PORT}:${FASTAPP_UVICORN_PORT}
+        restart: always
+
+volumes:
+  data:
