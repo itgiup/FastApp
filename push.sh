@@ -2,6 +2,6 @@
 
 
 git add .
-git commit -m "ngon"
+git commit -m "hoi ngon"
 git push
 

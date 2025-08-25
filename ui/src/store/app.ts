@@ -27,7 +27,6 @@ export type InitialType = {
 }
 
 const { protocol, host, hostname, } = document.location;
-console.log(protocol, hostname);
 
 export const initialState: InitialType = {
     author: "author",
@@ -40,7 +39,6 @@ export const initialState: InitialType = {
     apiUrl: protocol + '//' + host + '/api/graphql',
     apiWsUrl: (protocol === 'https:' ? 'wss://' : 'ws://') + host + '/api/graphql'
 };
-console.log(initialState);
 
 export const imports = createAsyncThunk(
     `${NAME}/imports`,

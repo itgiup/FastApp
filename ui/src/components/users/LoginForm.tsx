@@ -1,22 +1,32 @@
-import React from "react";
+import { type FC } from "react";
 import { Form, Input, Button } from "antd";
-import { appContext, services } from "../../services";
+import { appContext } from "../../services";
 import { useTranslation } from "react-i18next";
+import { UserErrors } from "../../schemas/user";
+import { useNavigate } from "react-router-dom";
+import type { UserClient } from "../../services/user";
 
+interface Props {
+    client: UserClient
+}
 
-export const LoginForm: React.FC = () => {
+export const LoginForm: FC<Props> = ({ client }) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const onFinish = async (values: { username: string; password: string }) => {
-        const { user } = services;
-        if (!user) {
-            appContext.message?.error(t("User client has not initiated"))
+        if (!client) {
+            appContext.message?.error(t(UserErrors.UserClientHasNotInitiated))
             return;
         }
         try {
-            const token = await user.login(values.username, values.password);
-            appContext.message?.success("Login successful");
-            console.log("Token:", token);
+            const token = await client.login(values.username, values.password);
+            if (token) {
+                appContext.message?.success("Login successful");
+                navigate("/user/me");
+            } else
+                appContext.message?.error("Login failed");
+
         } catch (err: any) {
             appContext.message?.error(err.message || "Login failed");
         }

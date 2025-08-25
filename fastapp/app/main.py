@@ -21,8 +21,8 @@ from app.routes import graphql_app
 async def lifespan(application: FastAPI):  # noqa
     configure_logging()
     
-    # await init_db.init()
-    # await run_services()
+    await init_db.init()
+    await run_services()
 
     yield
     log.info(f"{Back.RED}Chương trình kết thúc")

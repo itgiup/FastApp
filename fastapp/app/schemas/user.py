@@ -66,7 +66,12 @@ class UserType:
     username: str
     email: str
     is_active: bool
-    is_superuser: bool
+    is_superuser: Optional[bool]
     created_at: datetime
-    api_key: str
+    api_key: Optional[str]
 
+
+@strawberry.input
+class UpdateUserInput:
+    username: Optional[str] = None
+    email: Optional[str] = None

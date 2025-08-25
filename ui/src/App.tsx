@@ -20,8 +20,7 @@ import { appContext, startServices } from './services';
 import { Loading } from './components/Loading';
 import { createGQLClient } from './services/graphQLClient';
 import { BtnCopy } from './components';
-import { LoginForm } from './components/users/Login';
-// import { createGQLClient } from './services/graphQLClient';
+import { LoginForm } from './components/users/LoginForm';
 
 type MenuItem = Required<MenuProps>['items'][number];
 const { Header, Content, Footer } = Layout;

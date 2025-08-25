@@ -2,7 +2,10 @@ import {
     ApolloClient,
     gql,
 } from "@apollo/client";
-import type { LoginResponse, LoginVariables } from "../schemas/user";
+import type { LoginResponse, LoginState, LoginVariables, UserType } from "../schemas/user";
+import { jwtDecode } from "jwt-decode";
+import dayjs from "dayjs";
+
 
 export class UserClient {
     private tokenKey = "access_token";
@@ -10,10 +13,43 @@ export class UserClient {
 
     constructor(client: ApolloClient) {
         this.client = client
+        this.init();
     }
 
-    private getToken(): string | null {
+    public getToken(): string | null {
         return localStorage.getItem(this.tokenKey);
+    }
+
+    /** Kiểm tra token còn hạn không */
+    private isTokenValid(token: string): boolean {
+        try {
+            const decoded: { exp?: number } = jwtDecode(token);
+            if (!decoded.exp) return false;
+            const now = Math.floor(Date.now() / 1000);
+            return decoded.exp > now;
+        } catch {
+            return false;
+        }
+    }
+
+    /** Trạng thái login: LOGGED_IN, LOGGED_OUT, EXPIRED */
+    public getLoginState(): LoginState {
+        const token = this.getToken();
+        if (!token) return "LOGGED_OUT";
+        return this.isTokenValid(token) ? "LOGGED_IN" : "EXPIRED";
+    }
+
+    /** Đã login chưa (và token hợp lệ) */
+    public isAuthenticated(): boolean {
+        return this.getLoginState() === "LOGGED_IN";
+    }
+
+    /** Kiểm tra khi khởi động (có thể gọi ở App.tsx) */
+    public init(): void {
+        const state = this.getLoginState();
+        if (state === "EXPIRED") {
+            this.logout();
+        }
     }
 
     public async login(username: string, password: string): Promise<string> {
@@ -29,8 +65,6 @@ export class UserClient {
             mutation: LOGIN_MUTATION,
             variables: { username, password },
         });
-        console.log(data);
-
         const token = data?.login?.accessToken;
         if (!token) throw new Error("Login failed");
         localStorage.setItem(this.tokenKey, token);
@@ -41,27 +75,70 @@ export class UserClient {
         localStorage.removeItem(this.tokenKey);
     }
 
-    public isAuthenticated(): boolean {
-        return !!this.getToken();
-    }
+    /** Lấy thông tin user hiện tại từ server */
+    public async getMe(): Promise<UserType | undefined> {
+        const token = this.getToken();
+        if (!token || !this.isTokenValid(token)) {
+            throw new Error("User not authenticated or token expired");
+        }
 
-    /**
-     * Subscribes to user activity updates.
-     * @returns An ObservableQuery that you can subscribe to.
-     */
-    public subscribeUserUpdates(): ObservableQuery<FetchResult<any>> {
-        const USER_SUBSCRIPTION = gql`
-            subscription UserUpdates {
-                userActivity
+        const ME_QUERY = gql`
+            query Me {
+                me {
+                    id
+                    username
+                    email
+                    isActive
+                    isSuperuser
+                    createdAt
+                    apiKey
+                }
             }
         `;
 
-        // Use watchQuery to create a subscription-like observable
-        const observable = this.client.watchQuery({
-            query: USER_SUBSCRIPTION,
-            fetchPolicy: 'no-cache', // Important for subscriptions to bypass cache
+        const response = await this.client.query<{ me: UserType }>({
+            query: ME_QUERY,
+            context: { headers: { Authorization: `Bearer ${token}` } },
         });
 
-        return observable;
+        const me = response?.data?.me;
+        if (me) {
+            return { ...me, createdAt: dayjs(me.createdAt) };
+        }
+    }
+
+    async updateUser(input: { username?: string; email?: string }): Promise<UserType | undefined> {
+        const UPDATE_USER = gql`
+            mutation UpdateUser($username: String, $email: String) {
+                updateUser(input: { username: $username, email: $email }) {
+                    id
+                    username
+                    email
+                    isActive
+                    isSuperuser
+                    createdAt
+                    apiKey
+                }
+            }
+        `;
+
+        const token = this.getToken();
+        if (!token) throw new Error("No token found");
+
+        try {
+            const res = await this.client.mutate<{ updateUser: UserType }>({
+                mutation: UPDATE_USER,
+                variables: input,
+                context: { headers: { Authorization: `Bearer ${token}` } },
+            });
+            console.log(res);
+            const me = res?.data?.updateUser;
+            if (me) {
+                return { ...me, createdAt: dayjs(me.createdAt) };
+            }
+        } catch (err: any) {
+            console.error("Update user failed:", err);
+            throw new Error(err.message || "Update user failed");
+        }
     }
 }

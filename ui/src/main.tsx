@@ -15,7 +15,9 @@ import GenerateWallets from './pages/generate-wallets/index.tsx';
 import Tron from './pages/generate-wallets/tron.tsx';
 import NotFound from './pages/NotFound.tsx';
 import ICP from './pages/generate-wallets/icp.tsx';
-import { Loading } from './components/loading.tsx';
+import { Loading } from './components/Loading.tsx';
+import LoginPage from './pages/users/login.tsx';
+import MePage from './pages/users/me.tsx';
 
 
 
@@ -47,6 +49,28 @@ const router = createBrowserRouter([{
     {
       path: "/about",
       element: <About />,
+    },
+    {
+      path: '/user',
+      children: [
+        {
+          path: "login",
+          element: <LoginPage />,
+        },
+        {
+          // element: <ProtectedRoute />, // bảo vệ các route dưới đây
+          children: [
+            {
+              index: true, // /user
+              element: <MePage />,
+            },
+            {
+              path: "me",
+              element: <MePage />,
+            },
+          ],
+        },
+      ],
     },
     {
       path: "*",
