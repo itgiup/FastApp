@@ -16,7 +16,10 @@ import Logo from './assets/logo.svg?react';
 
 
 import 'flag-icon-css/css/flag-icons.min.css';
-import { appContext } from './services';
+import { appContext, startServices } from './services';
+import { Loading } from './components/loading';
+import { createGQLClient } from './services/graphQLClient';
+// import { createGQLClient } from './services/graphQLClient';
 
 type MenuItem = Required<MenuProps>['items'][number];
 const { Header, Content, Footer } = Layout;
@@ -76,7 +79,11 @@ const App: FC = () => {
   const location = useLocation();
   const mounted = useRef(false);
   const [_, setRenderCount] = useState(0);
-  const reRender = setRenderCount(pre => pre + 1);
+  const reRender = () => setRenderCount(pre => pre + 1);
+  const [loading, setLoading] = useState(true);
+  const [states] = useState<{ appSettings: appStore.InitialType }>({ appSettings });
+  // states.appSettings = appSettings;
+
   const { t } = useTranslation();
 
   const [messageApi, messageApiHolder] = message.useMessage();
@@ -88,7 +95,6 @@ const App: FC = () => {
     appContext.notification = notificationApi;
   }, [messageApi, notificationApi])
 
-
   const navigate = useNavigate();
 
   const [current, setCurrent] = useState<string>(location.pathname);
@@ -97,7 +103,6 @@ const App: FC = () => {
 
   // Responsive breakpoint, Update isMobile on window resize
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
 
   const changeLanguage = (value: string) => {
     dispatch(appStore.change({
@@ -117,12 +122,30 @@ const App: FC = () => {
     });
   };
 
+  /** load store  */
+  async function loadStore() {
+    await dispatch(appStore.load());
+  }
+
+  /** chạy service  */
+
+
   // didmount effect to load initial settings
   useEffect(() => {
     if (!mounted.current) {
       mounted.current = true;
-      dispatch(appStore.load()).then((r) => {
-      }).catch(() => { });
+
+      loadStore()
+        .then(() => {
+          setLoading(false);
+          const GQLClient = createGQLClient(states.appSettings.apiUrl, states.appSettings.apiWsUrl);
+          appContext.graphQLClient = GQLClient;
+          startServices();
+        })
+        .catch((err: any) => {
+          console.error(err)
+        });
+      return () => { }
     }
     mounted.current = true;
   }, []);
@@ -261,6 +284,7 @@ const App: FC = () => {
     }
   ];
 
+  if (loading) return <Loading />;
 
   return (
     <ConfigProvider
