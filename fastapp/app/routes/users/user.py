@@ -1,0 +1,93 @@
+import asyncio
+from typing import AsyncGenerator, List, Optional
+
+import strawberry
+from strawberry.types import Info
+
+from app.schemas.user import UserType
+from app.models.user import User
+from app.routes.deps import require_superuser
+
+
+@strawberry.type
+class UserQuery:
+    @strawberry.field
+    async def me(self, info: Info) -> Optional[UserType]:
+        """Trả về thông tin người dùng hiện tại dựa trên token/api_key."""
+        request = info.context["request"]
+        token = request.headers.get("Authorization", "").replace("Bearer ", "")
+        api_key = request.query_params.get("api_key")
+        # Gọi hàm get_current_user từ deps.py
+        from app.routes.deps import get_current_user
+        user = await get_current_user(api_key=api_key, token=token)
+        if not user:
+            return None
+        return UserType(
+            id=str(user.id),
+            username=user.username,
+            email=user.email,
+            is_active=user.is_active,
+            is_superuser=user.is_superuser,
+        )
+
+    @strawberry.field
+    @require_superuser
+    async def all_users(self, info: Info) -> List[UserType]:
+        """Chỉ superuser mới xem được toàn bộ user."""
+        users = await User.find_all().to_list()
+        return [
+            UserType(
+                id=str(u.id),
+                username=u.username,
+                email=u.email,
+                is_active=u.is_active,
+                is_superuser=u.is_superuser,
+            )
+            for u in users
+        ]
+
+
+@strawberry.type
+class UserMutation:
+    @strawberry.mutation
+    async def register_user(
+        self, username: str, email: str, password: str
+    ) -> UserType:
+        """Đăng ký user mới."""
+        from app.core.security import get_password_hash
+
+        user = User(
+            username=username.lower(),
+            email=email.lower(),
+            hashed_password=get_password_hash(password),
+        )
+        await user.insert()
+        return UserType(
+            id=str(user.id),
+            username=user.username,
+            email=user.email,
+            is_active=user.is_active,
+            is_superuser=user.is_superuser,
+        )
+
+    @strawberry.mutation
+    @require_superuser
+    async def deactivate_user(self, info: Info, username: str) -> bool:
+        """Chỉ superuser mới có thể deactivate user."""
+        user = await User.get_by_username(username=username)
+        if not user:
+            return False
+        user.is_active = False
+        await user.save()
+        return True
+
+
+@strawberry.type
+class UserSubscription:
+    @strawberry.subscription
+    async def user_activity(self) -> AsyncGenerator[str]:
+        """Ví dụ subscription giả lập thông báo."""
+        # Giả sử mỗi 2 giây gửi thông báo
+        for i in range(3):
+            yield f"User activity event {i}"
+            await asyncio.sleep(2)

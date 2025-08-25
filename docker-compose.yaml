@@ -1,0 +1,66 @@
+services:
+  # ***** database *****
+  mongo:
+    # This service name will be also used as hostname for MONGODB_URI
+    image: mongo
+    volumes:
+      - ./data/mongo:/data/db
+    restart: always
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    volumes:
+      - ./data/qdrant:/qdrant/storage
+    restart: always
+
+  postgres:
+    image: postgres
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    restart: always
+
+  # Redis for job queue
+  redis:
+    image: redis
+    volumes:
+      - ./data/redis:/data
+    restart: unless-stopped
+  # /***** database *****
+ 
+  # ***** backend *****
+  # fastapp:
+  #   build:
+  #     context: ./fastapp
+  #   depends_on:
+  #     - mongo
+  #     - postgres
+  #     - redis
+  #     - qdrant
+  #   env_file:
+  #     - ./fastapp/.env
+  #   restart: always
+
+  # /***** backend ***** 
+
+  # ***** frontend *****
+  # ui:
+  #   image: nginx
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./ui/dist:/usr/share/nginx/html
+  #     - ./ui/dist/certs:/etc/nginx/certs/
+  #     - ./ui/public/nginx.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - fastapp
+  #   restart: always
+  # /***** frontend *****
+
+volumes:
+  data:
+  ollama_data:
+
+
+networks:
+  app_network:
+    driver: bridge

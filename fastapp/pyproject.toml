@@ -1,0 +1,25 @@
+[project]
+name = "fastapp"
+version = "0.1.0"
+description = "Fastapp: fastapi, beanie, mongodb, redis, qdrant, strawberry-graphql"
+readme = "README.md"
+requires-python = ">=3.13"
+
+dependencies = [
+    "beanie>=2.0.0",
+    "colorama>=0.4.6",
+    "fastapi[standard]>=0.116.1",
+    "passlib[bcrypt]>=1.7.4",
+    "pydantic-settings>=2.10.1",
+    "python-jose[cryptography]>=3.5.0",
+    "qdrant-client>=1.15.1",
+    "redis>=6.4.0",
+    "requests>=2.32.5",
+    "strawberry-graphql[fastapi]>=0.280.0",
+    "structlog>=25.4.0",
+]
+
+
+
+[project.scripts]
+dev = "python main.py"
