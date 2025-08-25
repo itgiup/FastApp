@@ -1,0 +1,79 @@
+{
+    "vi": "🇻🇳",
+    "en": "🇬🇧",
+    "zh": "🇨🇳",
+    "ru": "🇷🇺",
+    "MISSING_USERNAME": "缺少用户名",
+    "MISSING_ADDRESS": "缺少地址",
+    "MISSING_EMAIL": "缺少电子邮件",
+    "MISSING_PASSWORD": "缺少密码",
+    "WRONG_USERNAME_FORMAT": "用户名格式错误",
+    "WRONG_ADDRESS_FORMAT": "地址格式错误",
+    "WRONG_PRIVATEKEY_FORMAT": "私钥格式错误",
+    "WRONG_EMAIL_FORMAT": "电子邮件格式错误",
+    "WRONG_PASSWORD_FORMAT": "密码格式错误",
+    "ER_DUP_ENTRY": "重复项",
+    "REGISTED": "已注册",
+    "SIGNUP_SUCCESS": "注册成功",
+    "SIGNIN_SUCCESS": "登录成功",
+    "SIGNIN_FAIL": "登录失败",
+    "NOT_URL_FORMAT": "网址格式错误",
+    "FLAG": "🇨🇳",
+    "greater": "大于",
+    "greaterEqual": "大于或等于",
+    "smaller": "小于",
+    "smallerEqual": "小于或等于",
+    "equal": "等于",
+    "cut": "裁剪",
+    "menu": {
+        "about": "关于我们",
+        "settings": "设置",
+        "Generate wallets": "生成钱包"
+    },
+    "about": {
+        "title": "关于 Brand",
+        "desc": "Brand 是一个完全免费的项目，帮助用户{{feature}}更安全、更有保障。非常易于使用，只需点击两次",
+        "featuresTitle": "主要功能",
+        "features": [
+            "免费、易于安装和使用",
+            "高度安全，匿名访问 Telegram",
+            "为多用户优化的性能"
+        ],
+        "contactTitle": "联系方式",
+        "contactDesc": "如果您有任何问题或反馈，请通过电子邮件联系我们：<1>{{mail}}</1>",
+        "reachonTelegram": "或通过 Telegram 联系我们"
+    },
+    "intro": {
+        "title": "易用 - 快速 & 安全！",
+        "description": "正在寻找稳定又安全的工具吗？我们的网站 {{site}} 快速又安全 —— 无需额外应用。",
+        "advantagesTitle": "主要优势：",
+        "advantages": {
+            "simple": "使用非常简单",
+            "secure": "最大限度的安全性",
+            "noEffect": "不影响其他应用",
+            "noApp": "无需安装其他应用",
+            "easySwitch": "轻松切换"
+        },
+        "guideTitle": "快速入门指南（附图示）",
+        "guideSteps": [
+            "访问 {{site}}",
+            "输入数量",
+            "点击 “生成”",
+            "完成！",
+            "下载 CSV 文件"
+        ],
+        "cta": {
+            "linkText": "立即访问",
+            "slogan": "快速 - 安全 - 无限制。立即从 {{site}} 开始畅快体验！"
+        },
+        "illustrationAlt": "操作说明图示"
+    },
+    "Number of wallets": "钱包数量",
+    "Generate Wallets": "生成钱包",
+    "in bulk": "批量",
+    "CSV Export": "导出 CSV",
+    "Search wallet": "搜索钱包",
+    "Balance": "余额",
+    "Cancel": "取消",
+    "Get all balances": "获取所有余额"
+}

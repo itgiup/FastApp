@@ -53,7 +53,11 @@ class UserInDB(UserInDBBase):
 
 # GraphQL 
 import strawberry
-from pydantic import EmailStr
+
+@strawberry.type
+class AuthPayload:
+    access_token: str
+    token_type: str = "bearer"
 
 
 @strawberry.type

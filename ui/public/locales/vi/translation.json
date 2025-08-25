@@ -1,0 +1,79 @@
+{
+    "vi": "🇻🇳",
+    "en": "🇬🇧",
+    "zh": "🇨🇳",
+    "ru": "🇷🇺",
+    "MISSING_USERNAME": "Thiếu tên người dùng",
+    "MISSING_ADDRESS": "Thiếu địa chỉ",
+    "MISSING_EMAIL": "Thiếu email",
+    "MISSING_PASSWORD": "Thiếu mật khẩu",
+    "WRONG_USERNAME_FORMAT": "Sai định dạng tên người dùng",
+    "WRONG_ADDRESS_FORMAT": "Sai định dạng địa chỉ",
+    "WRONG_PRIVATEKEY_FORMAT": "Sai định dạng private key",
+    "WRONG_EMAIL_FORMAT": "Sai định dạng email",
+    "WRONG_PASSWORD_FORMAT": "Sai định dạng mật khẩu",
+    "ER_DUP_ENTRY": "Bị trùng",
+    "REGISTED": "Đã đăng ký",
+    "SIGNUP_SUCCESS": "Đăng ký thành công",
+    "SIGNIN_SUCCESS": "Đăng nhập thành công",
+    "SIGNIN_FAIL": "Đăng nhập thất bại",
+    "NOT_URL_FORMAT": "Sai định dạng URL",
+    "FLAG": "🇻🇳",
+    "greater": "Lớn hơn",
+    "greaterEqual": "Lớn hơn hoặc bằng",
+    "smaller": "Nhỏ hơn",
+    "smallerEqual": "Nhỏ hơn hoặc bằng",
+    "equal": "Bằng",
+    "cut": "Cắt",
+    "menu": {
+        "about": "Giới thiệu",
+        "settings": "Cài đặt",
+        "Generate wallets": "Tạo ví"
+    },
+    "about": {
+        "title": "Về Brand",
+        "desc": "Brand là một dự án hoàn toàn miễn phí giúp người dùng {{feature}} một cách an toàn và bảo mật hơn. Cực kỳ dễ sử dụng, chỉ với 2 lần nhấp chuột",
+        "featuresTitle": "Tính năng chính",
+        "features": [
+            "Miễn phí, dễ cài đặt và sử dụng",
+            "Bảo mật cao, truy cập ẩn danh vào Telegram",
+            "Hiệu năng tối ưu cho nhiều người dùng"
+        ],
+        "contactTitle": "Liên hệ",
+        "contactDesc": "Nếu bạn có bất kỳ câu hỏi hoặc phản hồi nào, vui lòng liên hệ chúng tôi qua email: <1>{{mail}}</1>",
+        "reachonTelegram": "Hoặc liên hệ qua Telegram"
+    },
+    "intro": {
+        "title": "Dễ sử dụng – Nhanh & An toàn!",
+        "description": "Bạn đang tìm kiếm một giải pháp ổn định và bảo mật? Website của chúng tôi {{site}} nhanh chóng và an toàn — không cần cài thêm ứng dụng.",
+        "advantagesTitle": "Ưu điểm nổi bật:",
+        "advantages": {
+            "simple": "Rất dễ sử dụng",
+            "secure": "Bảo mật tối đa",
+            "noEffect": "Không ảnh hưởng đến ứng dụng khác",
+            "noApp": "Không cần cài thêm ứng dụng",
+            "easySwitch": "Chuyển đổi dễ dàng"
+        },
+        "guideTitle": "Hướng dẫn nhanh (kèm minh họa)",
+        "guideSteps": [
+            "Truy cập {{site}}",
+            "Nhập số lượng",
+            "Bấm 'Tạo ví'",
+            "Hoàn tất!",
+            "Tải về CSV"
+        ],
+        "cta": {
+            "linkText": "Truy cập ngay",
+            "slogan": "Nhanh - An toàn - Không giới hạn. Trải nghiệm mượt mà hơn từ {{site}} ngay hôm nay!"
+        },
+        "illustrationAlt": "Hình minh họa cách sử dụng"
+    },
+    "Number of wallets": "Số lượng ví",
+    "Generate Wallets": "Tạo ví",
+    "in bulk": "hàng loạt",
+    "CSV Export": "Xuất CSV",
+    "Search wallet": "Tìm kiếm ví",
+    "Balance": "Số dư",
+    "Cancel": "Hủy",
+    "Get all balances": "Lấy tất cả số dư"
+}

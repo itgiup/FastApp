@@ -20,9 +20,8 @@ from app.routes import graphql_app
 @asynccontextmanager
 async def lifespan(application: FastAPI):  # noqa
     configure_logging()
-    log.info("Đã khởi động thành công ")
+    
     # await init_db.init()
-
     # await run_services()
 
     yield

@@ -1,17 +1,17 @@
 import asyncio
 from typing import AsyncGenerator, List, Optional
-
 import strawberry
 from strawberry.types import Info
 
-from app.schemas.user import UserType
+from app.core.security import create_access_token
+from app.schemas.user import AuthPayload, UserType
 from app.models.user import User
 from app.routes.deps import require_superuser
 
 
 @strawberry.type
 class UserQuery:
-    @strawberry.field
+    @strawberry.field 
     async def me(self, info: Info) -> Optional[UserType]:
         """Trả về thông tin người dùng hiện tại dựa trên token/api_key."""
         request = info.context["request"]
@@ -81,6 +81,15 @@ class UserMutation:
         await user.save()
         return True
 
+
+    @strawberry.mutation
+    async def login(self, username: str, password: str) -> AuthPayload:
+        """Kiểm tra username/password và trả về JWT."""
+        user = await User.authenticate(username=username, password=password)
+        if not user:
+            raise ValueError("Invalid username or password")
+        token = create_access_token(subject=str(user.id))
+        return AuthPayload(access_token=token)
 
 @strawberry.type
 class UserSubscription:

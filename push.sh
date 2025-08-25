@@ -2,6 +2,6 @@
 
 
 git add .
-git commit -m "a"
+git commit -m "ngon"
 git push
 

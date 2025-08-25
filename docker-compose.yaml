@@ -15,9 +15,11 @@ services:
 
   postgres:
     image: postgres
+    restart: always
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-    restart: always
 
   # Redis for job queue
   redis:
@@ -28,32 +30,34 @@ services:
   # /***** database *****
  
   # ***** backend *****
-  # fastapp:
-  #   build:
-  #     context: ./fastapp
-  #   depends_on:
-  #     - mongo
-  #     - postgres
-  #     - redis
-  #     - qdrant
-  #   env_file:
-  #     - ./fastapp/.env
-  #   restart: always
+  fastapp:
+    build:
+      context: ./fastapp
+    depends_on:
+      - mongo
+      - postgres
+      - redis
+      - qdrant
+    env_file:
+      - ./fastapp/.env
+    volumes:
+      - ./fastapp/.env:/fastapp/.env:ro
+      - ./fastapp/app:/fastapp/app:ro
+      - ./fastapp/app/pyproject.toml:/fastapp/app/pyproject.toml:ro
+    restart: always
 
   # /***** backend ***** 
 
   # ***** frontend *****
-  # ui:
-  #   image: nginx
-  #   ports:
-  #     - "80:80"
-  #   volumes:
-  #     - ./ui/dist:/usr/share/nginx/html
-  #     - ./ui/dist/certs:/etc/nginx/certs/
-  #     - ./ui/public/nginx.conf:/etc/nginx/conf.d/default.conf
-  #   depends_on:
-  #     - fastapp
-  #   restart: always
+  ui:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./ui/dist:/usr/share/nginx/html:ro
+      - ./ui/dist/certs:/etc/nginx/certs:ro
+      - ./ui/dist/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: always
   # /***** frontend *****
 
 volumes:
