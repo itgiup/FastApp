@@ -29,6 +29,7 @@ export class UserClient {
             mutation: LOGIN_MUTATION,
             variables: { username, password },
         });
+        console.log(data);
 
         const token = data?.login?.accessToken;
         if (!token) throw new Error("Login failed");

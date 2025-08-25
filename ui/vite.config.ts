@@ -9,5 +9,11 @@ export default defineConfig({
     host: true, // Hoặc '0.0.0.0'
     port: 5173,
     allowedHosts: true,
+    proxy: {
+      "/api": {
+        target: "http://host",
+        changeOrigin: true,
+      },
+    },
   },
 })

@@ -26,6 +26,9 @@ export type InitialType = {
     apiWsUrl: string;
 }
 
+const { protocol, host, hostname, } = document.location;
+console.log(protocol, hostname);
+
 export const initialState: InitialType = {
     author: "author",
     version: "0.0.1",
@@ -34,9 +37,10 @@ export const initialState: InitialType = {
     // các cài đặt khác
     theme: "dark",
     language: 'en',
-    apiUrl: '/api/graphql',
-    apiWsUrl: (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/api/graphql'
+    apiUrl: protocol + '//' + host + '/api/graphql',
+    apiWsUrl: (protocol === 'https:' ? 'wss://' : 'ws://') + host + '/api/graphql'
 };
+console.log(initialState);
 
 export const imports = createAsyncThunk(
     `${NAME}/imports`,

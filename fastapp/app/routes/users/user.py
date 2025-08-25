@@ -7,6 +7,7 @@ from app.core.security import create_access_token
 from app.schemas.user import AuthPayload, UserType
 from app.models.user import User
 from app.routes.deps import require_superuser
+from app.utils import log
 
 
 @strawberry.type
@@ -85,6 +86,7 @@ class UserMutation:
     @strawberry.mutation
     async def login(self, username: str, password: str) -> AuthPayload:
         """Kiểm tra username/password và trả về JWT."""
+        log.info(f"{username}, {password}")
         user = await User.authenticate(username=username, password=password)
         if not user:
             raise ValueError("Invalid username or password")

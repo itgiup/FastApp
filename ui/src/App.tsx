@@ -3,10 +3,10 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useStoreDispatch, useStore } from "./store/hooks";
 import {
   Button, Col, ConfigProvider, Drawer, Dropdown, Flex,
-  Layout, Menu, message, notification, Row, Space, Switch, theme,
+  Layout, Menu, message, notification, Popover, Row, Space, Switch, theme,
 } from 'antd';
 import type { MenuProps } from 'antd';
-import { DownOutlined, MenuOutlined } from '@ant-design/icons';
+import { DownOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
 import * as appStore from './store/app';
 import i18n from './services/i18n';
 import './App.scss'
@@ -17,8 +17,10 @@ import Logo from './assets/logo.svg?react';
 
 import 'flag-icon-css/css/flag-icons.min.css';
 import { appContext, startServices } from './services';
-import { Loading } from './components/loading';
+import { Loading } from './components/Loading';
 import { createGQLClient } from './services/graphQLClient';
+import { BtnCopy } from './components';
+import { LoginForm } from './components/users/Login';
 // import { createGQLClient } from './services/graphQLClient';
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -127,7 +129,6 @@ const App: FC = () => {
     await dispatch(appStore.load());
   }
 
-  /** chạy service  */
 
 
   // didmount effect to load initial settings
@@ -140,6 +141,8 @@ const App: FC = () => {
           setLoading(false);
           const GQLClient = createGQLClient(states.appSettings.apiUrl, states.appSettings.apiWsUrl);
           appContext.graphQLClient = GQLClient;
+
+          /** chạy service  */
           startServices();
         })
         .catch((err: any) => {
@@ -281,6 +284,14 @@ const App: FC = () => {
           </a>
         </Dropdown>
       ,
+    },
+    // user
+    {
+      key: 'user',
+      label: <Popover content={<>
+        <LoginForm />
+      </>}
+      ><UserOutlined /></Popover>
     }
   ];
 
@@ -323,6 +334,12 @@ const App: FC = () => {
                 />
                 <Flex justify="start" gap={16} style={{ padding: 10 }}>
                   <Space>
+                    {/* user */}
+                    <Popover content={<>
+                      <LoginForm />
+                    </>}
+                    ><UserOutlined /></Popover>
+
                     {/* theme */}
                     <Switch
                       checked={appSettings.theme === 'dark'}
@@ -364,7 +381,7 @@ const App: FC = () => {
 
         <Footer style={{ textAlign: 'center' }}>
           {/* Donations */}
-          {/* <h3>{t("Donations")}:</h3>
+          <h3>{t("Donations")}:</h3>
           <Row justify="center" className="footer-donations" gutter={24}>
 
             {donations.map((w, idx) => (
@@ -384,7 +401,7 @@ const App: FC = () => {
               </Col>
             ))}
 
-          </Row> */}
+          </Row>
 
           {/* copy right */}
           <Row justify="center" className='footer-row' gutter={24}>

@@ -24,5 +24,5 @@ export const services: {
 export function startServices() {
     if (!appContext.graphQLClient) throw new Error("appContext.graphQLClient has not initiated");
 
-    const user = new UserClient(appContext.graphQLClient)
+    services.user = new UserClient(appContext.graphQLClient)
 }
