@@ -6,14 +6,15 @@
  */
 import { createContext, useContext, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { LoadingOutlined, } from '@ant-design/icons';
 import type { UserType, UpdateUserInput } from "../../schemas/user";
 import { appContext, services } from "../../services";
 import type { UserClient } from "../../services/user";
+import { boolean } from "zod";
 type AuthContextType = {
     token: string | null;
     isLoggedIn: boolean;
     profile: UserType | null;
+    isSuper: boolean;
     userClient: UserClient | null
     login: (username: string, password: string) => Promise<string | null>;
     logout: () => void;
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true); // loading khi khởi động
     const [profile, setProfile] = useState<UserType | null>(null);
+    const [isSuper, setIsSuper] = useState(false);
     const [userClient, setUserClient] = useState(services.user);
 
     // khi mount, kiểm tra client + token
@@ -109,6 +111,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return profile;
     }
 
+    useEffect(() => {
+        setIsSuper(profile?.isSuperuser === true);
+    }, [profile])
+
 
     return (
         <AuthContext.Provider
@@ -116,6 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 userClient,
                 token, isLoggedIn: !!token,
                 profile,
+                isSuper,
                 login, logout,
                 updateUser,
                 loading

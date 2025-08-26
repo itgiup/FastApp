@@ -17,7 +17,7 @@ export type InitialType = {
     copyYear: number;
     title: string;
     // các cài đặt khác
-    theme: string;
+    theme: "dark" | "light";
     language: string;
 
     /** http url */

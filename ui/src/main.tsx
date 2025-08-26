@@ -20,20 +20,28 @@ import LoginPage from './pages/users/login.tsx';
 import MePage from './pages/users/me.tsx';
 import { AuthProvider } from './components/users/AuthContext.tsx';
 import ProtectedRoute from './components/users/ProtectedRoute.tsx';
+import DashboardLayout from './pages/dashboard/DashboardLayout.tsx';
+import DashboardOverview from './pages/dashboard/DashboardOverview.tsx';
+import DashboardUsers from './pages/dashboard/DashboardUsers.tsx';
+import DashboardAnalytics from './pages/dashboard/DashboardAnalytics.tsx';
+import ProtectedRouteSuper from './components/users/ProtectedRouteSuper.tsx';
 
 
 
 const router = createBrowserRouter([{
   element: <App />,
   children: [
+    // /
     {
       path: "/",
       element: <Home />,
     },
+    // settings
     {
       path: "/settings",
       element: <Settings />,
     },
+    // generate-wallets
     {
       path: "/generate-wallets",
       element: <GenerateWallets />,
@@ -48,10 +56,12 @@ const router = createBrowserRouter([{
         },
       ],
     },
+    // about
     {
       path: "/about",
       element: <About />,
     },
+    // user
     {
       path: '/user',
       children: [
@@ -74,6 +84,36 @@ const router = createBrowserRouter([{
         },
       ],
     },
+    // Dashboard và các trang con của nó
+    {
+      path: "/dashboard",
+      // Sử dụng ProtectedRoute để bảo vệ toàn bộ dashboard
+      element: <ProtectedRouteSuper />,
+      children: [
+        {
+          element: <DashboardLayout />, // DashboardLayout sẽ chứa Outlet để hiển thị các route con
+          children: [
+            {
+              index: true,
+              element: <DashboardOverview />,
+            },
+            {
+              path: 'overview',
+              element: <DashboardOverview />,
+            },
+            {
+              path: "users",
+              element: <DashboardUsers />,
+            },
+            {
+              path: "analytics",
+              element: <DashboardAnalytics />,
+            },
+          ]
+        },
+      ],
+    },
+    // *
     {
       path: "*",
       element: <NotFound />
