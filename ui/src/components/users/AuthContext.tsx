@@ -1,97 +1,109 @@
 /**
- * AuthContext hoặc useAuth hook (quản lý trạng thái đăng nhập).
- * Để lưu, đọc, và clear token toàn cục thay vì mỗi component tự xử lý.
+ * khi khởi động lên, 
+    - nếu client chưa khởi tạo (!client) thì khóa các phần yêu cầu đăng nhập 
+    - nếu đã đăng nhập (client.isTokenValid()) thì lấy token
+    - nếu chưa (!client.isTokenValid()) thì khóa các phần yêu cầu đăng nhập 
  */
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { services } from "../../services";
-import type { UserType } from "../../schemas/user";
+import { createContext, useContext, useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { LoadingOutlined, } from '@ant-design/icons';
+import type { UserType, UpdateUserInput } from "../../schemas/user";
+import { appContext, services } from "../../services";
 import type { UserClient } from "../../services/user";
-
 type AuthContextType = {
     token: string | null;
-    user: UserType | null;
     isLoggedIn: boolean;
-    loading: boolean;
-    error: string | null;
-    login: (token: string) => Promise<void>;
+    profile: UserType | null;
+    userClient: UserClient | null
+    login: (username: string, password: string) => Promise<string | null>;
     logout: () => void;
+    updateUser: (fields: UpdateUserInput) => Promise<UserType | null>;
 };
-
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-    userClient: UserClient
-    children: React.ReactNode;
-}
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ userClient, children }) => {
-
+    const { t } = useTranslation();
     const [token, setToken] = useState<string | null>(null);
-    const [user, setUser] = useState<UserType | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true); // loading khi khởi động
+    const [profile, setProfile] = useState<UserType | null>(null);
+    const [userClient, setUserClient] = useState(services.user);
 
-    // Load token từ localStorage khi app khởi động
+    // khi mount, kiểm tra client + token
     useEffect(() => {
+        const userClient = services.user;
+        setUserClient(userClient);
         (async () => {
-            const savedToken = userClient.getToken();
-            if (savedToken && userClient.isAuthenticated()) {
-                setToken(savedToken);
-                await fetchUser(savedToken);
-            } else {
-                setToken(null);
-                setUser(null);
+            if (!userClient) {
+                // client chưa khởi tạo
+                setLoading(false);
+                return;
             }
+            const isAuthenticated = userClient.isAuthenticated();
+            if (!isAuthenticated) {
+                setToken(null);
+            } else {
+                const savedToken = userClient.getToken();
+                setToken(savedToken); // token còn hạn
+                const profile = await userClient.getMe();
+                if (profile)
+                    setProfile(profile);
+            }
+
             setLoading(false);
         })();
-    }, []);
+    }, [services.user]);
 
-    const fetchUser = async (token: string) => {
+    const login = async (username: string, password: string): Promise<string | null> => {
+        const userClient = services.user;
+        if (!userClient) return null;
         try {
-            const userData = await userClient.getMe();
-            setUser(userData ?? null);
+            setLoading(true);
+            const token = await userClient.login(username, password);
+            setToken(token);
+            const profile = await userClient.getMe();
+            if (profile)
+                setProfile(profile);
+            setLoading(false);
+            return token;
         } catch (err: any) {
-            console.error("Failed to fetch user:", err);
-            setError(err.message || "Failed to fetch user");
-            setUser(null);
+            appContext.message?.error(t(err?.message || err.error || err))
         }
-    };
-
-    // Hàm login
-    const login = async (newToken: string) => {
-        userClient.login()
-        setToken(newToken);
-        setLoading(true);
-        await fetchUser(newToken);
         setLoading(false);
+        return null;
     };
 
-    // Hàm logout
     const logout = () => {
-        localStorage.removeItem("access_token");
+        const client = services.user;
+        if (client) client.logout(); // xóa token client
         setToken(null);
-        setUser(null);
+        setProfile(null);
     };
+
+    const updateUser = async (fields: UpdateUserInput): Promise<UserType | null> => {
+        const userClient = services.user;
+        if (!userClient) return null;
+        const profile = await userClient.updateUser(fields);
+        setProfile(profile)
+        return profile;
+    }
+
 
     return (
         <AuthContext.Provider
             value={{
-                token,
-                user,
-                isLoggedIn: !!user,
-                loading,
-                error,
-                login,
-                logout,
-            }}
-        >
-            {children}
+                userClient,
+                token, isLoggedIn: !!token,
+                profile,
+                login, logout,
+                updateUser
+            }}>
+            {loading ? <LoadingOutlined spin /> : children}
         </AuthContext.Provider>
     );
 };
 
-// Hook tiện lợi
 export const useAuth = () => {
     const ctx = useContext(AuthContext);
     if (!ctx) throw new Error("useAuth must be used inside AuthProvider");

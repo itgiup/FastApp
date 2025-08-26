@@ -1,28 +1,25 @@
-import { services } from "../../services";
 import { useTranslation } from "react-i18next";
-import { UserErrors } from "../../schemas/user";
-import { UserProfile } from "../../components/users/UserProfile";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../components/users/AuthContext";
+import { Flex, Typography } from "antd";
+import { UserProfile } from "../../components/users/UserProfile";
 import { useEffect } from "react";
+
+const { Title } = Typography
+
 
 export default function MePage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { isLoggedIn} = useAuth();
 
-    const isAuthenticated = services.user?.isAuthenticated()
     useEffect(() => {
-        if (services.user) {
-            const isAuthenticated = services.user.isAuthenticated()
-            if (!isAuthenticated)
-                navigate('/user/login');
-        }
-    }, [navigate]);
+        if (!isLoggedIn)
+            navigate("/user/login")
+    }, [isLoggedIn])
 
-    if (!services.user) return t(UserErrors.UserClientHasNotInitiated)
-
-    if (isAuthenticated)
-        return (<>
-            <UserProfile client={services.user} />
-        </>);
-    return '...'
+    return (<Flex vertical align="center">
+        <Title level={3}>{t("user.profile")}</Title>
+        <UserProfile />
+    </Flex>);
 }

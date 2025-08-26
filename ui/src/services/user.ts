@@ -2,14 +2,16 @@ import {
     ApolloClient,
     gql,
 } from "@apollo/client";
-import type { LoginResponse, LoginState, LoginVariables, UserType } from "../schemas/user";
+import type { LoginResponse, LoginState, LoginVariables, UserType, UpdateUserInput } from "../schemas/user";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
+
 
 
 export class UserClient {
     private tokenKey = "access_token";
     private client: ApolloClient;
+    public userInfo: UserType | null = null;
 
     constructor(client: ApolloClient) {
         this.client = client
@@ -76,7 +78,7 @@ export class UserClient {
     }
 
     /** Lấy thông tin user hiện tại từ server */
-    public async getMe(): Promise<UserType | undefined> {
+    public async getMe(): Promise<UserType | null> {
         const token = this.getToken();
         if (!token || !this.isTokenValid(token)) {
             throw new Error("User not authenticated or token expired");
@@ -103,14 +105,17 @@ export class UserClient {
 
         const me = response?.data?.me;
         if (me) {
-            return { ...me, createdAt: dayjs(me.createdAt) };
+            const newMe = { ...me, createdAt: dayjs(me.createdAt) };
+            this.userInfo = newMe;
+            return newMe;
         }
+        return null
     }
 
-    async updateUser(input: { username?: string; email?: string }): Promise<UserType | undefined> {
+    async updateUser(input: UpdateUserInput): Promise<UserType | null> {
         const UPDATE_USER = gql`
-            mutation UpdateUser($username: String, $email: String) {
-                updateUser(input: { username: $username, email: $email }) {
+            mutation UpdateUser($email: String) {
+                updateUser(input: { email: $email }) {
                     id
                     username
                     email
@@ -134,11 +139,14 @@ export class UserClient {
             console.log(res);
             const me = res?.data?.updateUser;
             if (me) {
-                return { ...me, createdAt: dayjs(me.createdAt) };
+                const newMe = { ...me, createdAt: dayjs(me.createdAt) };
+                this.userInfo = newMe;
+                return newMe;
             }
         } catch (err: any) {
             console.error("Update user failed:", err);
             throw new Error(err.message || "Update user failed");
         }
+        return null;
     }
 }

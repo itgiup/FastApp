@@ -18,6 +18,8 @@ import ICP from './pages/generate-wallets/icp.tsx';
 import { Loading } from './components/Loading.tsx';
 import LoginPage from './pages/users/login.tsx';
 import MePage from './pages/users/me.tsx';
+import { AuthProvider } from './components/users/AuthContext.tsx';
+import ProtectedRoute from './components/users/ProtectedRoute.tsx';
 
 
 
@@ -58,7 +60,7 @@ const router = createBrowserRouter([{
           element: <LoginPage />,
         },
         {
-          // element: <ProtectedRoute />, // bảo vệ các route dưới đây
+          element: <ProtectedRoute />, // bảo vệ các route dưới đây
           children: [
             {
               index: true, // /user
@@ -86,7 +88,9 @@ createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>
-          <RouterProvider router={router} />
+          <AuthProvider>
+            <RouterProvider router={router} />
+          </AuthProvider>
         </I18nextProvider>
       </Provider>
     </StrictMode>

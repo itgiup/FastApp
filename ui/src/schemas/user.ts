@@ -27,3 +27,7 @@ export interface UserType {
     createdAt: Dayjs
     apiKey?: string
 }
+
+export interface UpdateUserInput {
+    email?: string
+}

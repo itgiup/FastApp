@@ -1,49 +1,38 @@
-import { type FC, useEffect, useState } from "react";
-import type { UserClient } from "../../services/user";
-import { Card, Typography, Spin, Alert, } from "antd";
+import { type FC, useState } from "react";
+import { Card, Typography, Spin, Alert, Button, Flex, } from "antd";
+import { CheckCircleOutlined, CheckCircleTwoTone, LogoutOutlined } from '@ant-design/icons';
 import { useTranslation } from "react-i18next";
+import { useAuth } from "./AuthContext";
+import { DAYTIMEFORMAT } from "../../utils/time";
 import { appContext } from "../../services";
+import type { UpdateUserInput } from "../../schemas/user";
 
 const { Text } = Typography;
 
 interface Props {
-    client: UserClient;
 }
+const checkedIcon = <CheckCircleTwoTone twoToneColor="#52c41a" />
+const uncheckedIcon = <CheckCircleOutlined />
 
-export const UserProfile: FC<Props> = ({ client }) => {
+
+export const UserProfile: FC<Props> = () => {
     const { t } = useTranslation();
+    const { isLoggedIn, profile, logout, userClient, updateUser } = useAuth()
 
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    if (!isLoggedIn) return <Alert type="warning" message={t("Please login to access")} showIcon />;
+
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            setLoading(true);
-            try {
-                const data = await client.getMe();
-                setUser(data);
-            } catch (err: any) {
-                setError(err.message || t("user.loadFailed"));
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchUser();
-    }, [client, t]);
-
-    const updateField = async (field: string, value: string) => {
-        if (!user) return;
-
-
+    const updateField = async (field: keyof UpdateUserInput, value: string) => {
         try {
-            const variables = { username: user.username, email: user.email };
+            if (!profile || !userClient) return;
+            const variables = { email: profile.email };
             variables[field] = value;
 
-            const success = await client.updateUser(variables);
-            if (success) {
+            const user = await updateUser(variables);
+            if (user) {
                 appContext.message?.success(t("user.updateSuccess"));
-                setUser(success)
             } else
                 appContext.message?.error(t("user.updateFailed"));
         } catch (err: any) {
@@ -51,42 +40,36 @@ export const UserProfile: FC<Props> = ({ client }) => {
         }
     };
 
-    if (loading) return <Spin tip={t("loading")} style={{ display: "block", margin: "50px auto" }} />;
     if (error) return <Alert type="error" message={error} style={{ margin: "20px" }} />;
-    if (!user) return <Alert type="warning" message={t("user.notLoggedIn")} style={{ margin: "20px" }} />;
+    if (!profile) return <Alert type="warning" message={t("user.notLoggedIn")} style={{ margin: "20px" }} />;
 
     return (
-        <Card
-            title={t("user.profile")}
-            style={{ maxWidth: 500, margin: "30px auto" }}
-        >
+        <Card>
             <p>
-                <strong>{t("user.username")}:</strong>{" "}
-                <Text
-                    editable={{
-                        onChange: (val) => updateField("username", val),
-                    }}
-                >
-                    {user.username}
+                <i className="small-info">{t("user.username")}:</i>{" "}
+                <Text>
+                    {profile.username}
                 </Text>
             </p>
 
             <p>
-                <strong>{t("user.email")}:</strong>{" "}
+                <i className="small-info">{t("user.email")}:</i>{" "}
                 <Text
                     editable={{
                         onChange: (val) => updateField("email", val),
                     }}
                 >
-                    {user.email}
+                    {profile.email}
                 </Text>
             </p>
 
-            <Card type="inner" title={t("user.otherInfo")} style={{ marginTop: 20 }}>
-                <p><strong>{t("user.id")}:</strong> {user.id}</p>
-                <p><strong>{t("user.active")}:</strong> {user.is_active ? t("yes") : t("no")}</p>
-                <p><strong>{t("user.admin")}:</strong> {user.is_superuser ? t("yes") : t("no")}</p>
-            </Card>
+            <p><i className="small-info">{t("user.id")}:</i> {profile.id}</p>
+            <p><i className="small-info">{t("user.active")}:</i> {profile.isActive ? checkedIcon : uncheckedIcon}</p>
+            <p><i className="small-info">{t("user.admin")}:</i> {profile.isSuperuser ? checkedIcon : uncheckedIcon}</p>
+            <p><i className="small-info">{profile.createdAt.format(DAYTIMEFORMAT)}</i></p>
+            <Flex justify="end">
+                <Button danger icon={<LogoutOutlined />} onClick={logout}>{t("Logout")}</Button>
+            </Flex>
         </Card>
     );
 };

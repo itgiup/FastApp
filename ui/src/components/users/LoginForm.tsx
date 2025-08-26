@@ -1,36 +1,30 @@
-import { type FC } from "react";
-import { Form, Input, Button } from "antd";
+import { useState, type FC } from "react";
+import { Form, Input, Button, Alert } from "antd";
 import { appContext } from "../../services";
 import { useTranslation } from "react-i18next";
-import { UserErrors } from "../../schemas/user";
-import { useNavigate } from "react-router-dom";
-import type { UserClient } from "../../services/user";
+import { useAuth } from "./AuthContext";
 
 interface Props {
-    client: UserClient
 }
 
-export const LoginForm: FC<Props> = ({ client }) => {
+export const LoginForm: FC<Props> = ({ }) => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const { isLoggedIn, login } = useAuth()
 
     const onFinish = async (values: { username: string; password: string }) => {
-        if (!client) {
-            appContext.message?.error(t(UserErrors.UserClientHasNotInitiated))
-            return;
-        }
         try {
-            const token = await client.login(values.username, values.password);
-            if (token) {
-                appContext.message?.success("Login successful");
-                navigate("/user/me");
-            } else
-                appContext.message?.error("Login failed");
-
+            setLoading(true);
+            const token = await login(values.username, values.password);
+            if (!token)
+                appContext.message?.error(t("Login failed"));
         } catch (err: any) {
-            appContext.message?.error(err.message || "Login failed");
+            appContext.message?.error(t(err.message || "Login failed"));
         }
+        setLoading(false);
     };
+
+    if (isLoggedIn) return <Alert message={t("Login success")} type="success" showIcon />
 
     return (
         <Form
@@ -45,7 +39,7 @@ export const LoginForm: FC<Props> = ({ client }) => {
             <Form.Item name="password" label={t("Password")} rules={[{ required: true }]}>
                 <Input.Password />
             </Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button type="primary" htmlType="submit" block loading={loading}>
                 {t("Login")}
             </Button>
         </Form>

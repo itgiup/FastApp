@@ -16,11 +16,11 @@ import Logo from './assets/logo.svg?react';
 
 
 import 'flag-icon-css/css/flag-icons.min.css';
-import { appContext, startServices } from './services';
+import { appContext, services, startServices } from './services';
 import { Loading } from './components/Loading';
 import { createGQLClient } from './services/graphQLClient';
 import { BtnCopy } from './components';
-import { LoginForm } from './components/users/LoginForm';
+import { User } from './components/users';
 
 type MenuItem = Required<MenuProps>['items'][number];
 const { Header, Content, Footer } = Layout;
@@ -288,9 +288,10 @@ const App: FC = () => {
     {
       key: 'user',
       label: <Popover content={<>
-        <LoginForm />
+        <User />
       </>}
-      ><UserOutlined /></Popover>
+      ><UserOutlined /></Popover>,
+      onClick: () => navigate('/user')
     }
   ];
 
@@ -335,7 +336,7 @@ const App: FC = () => {
                   <Space>
                     {/* user */}
                     <Popover content={<>
-                      <LoginForm />
+                      <User />
                     </>}
                     ><UserOutlined /></Popover>
 

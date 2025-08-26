@@ -4,30 +4,27 @@
 
 import { useTranslation } from "react-i18next";
 import { LoginForm } from "../../components/users/LoginForm";
-import { services } from "../../services";
-import { UserErrors } from "../../schemas/user";
+import { Typography, Flex } from "antd";
+import { useAuth } from "../../components/users/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Alert, Flex } from "antd";
 
+const { Title } = Typography
 
 export default function LoginPage() {
-    const { t } = useTranslation();
     const navigate = useNavigate();
+    const { t } = useTranslation();
+    const { isLoggedIn } = useAuth()
 
     useEffect(() => {
-        if (services.user && services.user.isAuthenticated()) {
-            navigate("/user/me");
-        }
-    }, [navigate]);
-
-    if (!services.user)
-        return <Alert message={t(UserErrors.UserClientHasNotInitiated)} type="error" />;
+        if (isLoggedIn)
+            navigate("/user/me")
+    }, [isLoggedIn])
 
     return (
-        <Flex vertical>
-            <h1>Đăng nhập</h1>
-            <LoginForm client={services.user} />
+        <Flex vertical align="center">
+            <Title level={3}>{t("Login")} </Title>
+            <LoginForm />
         </Flex>
     );
 }

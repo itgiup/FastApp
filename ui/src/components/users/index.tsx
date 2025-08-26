@@ -1,22 +1,26 @@
-import type { FC } from "react";
+import { type FC } from "react";
 import { useTranslation } from "react-i18next";
-import { UserErrors } from "../../schemas/user";
+import { Alert } from "antd";
+
 import { UserProfile } from "./UserProfile";
 import { LoginForm } from "./LoginForm";
-import type { UserClient } from "../../services/user";
+import { useAuth } from "./AuthContext";
+import { UserErrors } from "../../schemas/user";
 
 interface Props {
-    client: UserClient
 }
 
-
-export const User: FC<Props> = ({ client }) => {
+export const User: FC<Props> = ({ }) => {
     const { t } = useTranslation();
+    const { isLoggedIn, userClient } = useAuth()
 
-    if (!client) return t(UserErrors.UserClientHasNotInitiated);
-
-    if (client.isAuthenticated()) {
-        return <UserProfile client={client} />
+    if (!userClient) {
+        return <Alert type="warning" message={t(UserErrors.UserClientHasNotInitiated)} showIcon />;
     }
-    return <LoginForm client={client} />
+
+    if (isLoggedIn) {
+        return <UserProfile />
+    }
+
+    return <LoginForm />
 }
