@@ -3,7 +3,6 @@ import { EventEmitter } from "events";
 import { createSlice, createAsyncThunk, } from "@reduxjs/toolkit";
 import { changeSettings, exportSettings, importSettings, loadSettings, resetSettings, toggleValue } from "./functions";
 import type { UserType } from "../schemas/user";
-import { UserClient } from "../services/user";
 
 const NAME = "user";
 
