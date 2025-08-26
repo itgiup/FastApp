@@ -2,6 +2,6 @@
 
 
 git add .
-git commit -m "hoi ngon"
+git commit -m "user đăng nhập tốt, thay đổi được thông tin"
 git push
 

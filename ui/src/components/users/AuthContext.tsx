@@ -18,6 +18,7 @@ type AuthContextType = {
     login: (username: string, password: string) => Promise<string | null>;
     logout: () => void;
     updateUser: (fields: UpdateUserInput) => Promise<UserType | null>;
+    loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,11 +45,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             if (!isAuthenticated) {
                 setToken(null);
             } else {
-                const savedToken = userClient.getToken();
-                setToken(savedToken); // token còn hạn
-                const profile = await userClient.getMe();
-                if (profile)
-                    setProfile(profile);
+                try {
+                    setLoading(true)
+                    const savedToken = userClient.getToken();
+                    const profile = await userClient.getMe();
+                    if (profile) {
+                        setProfile(profile);
+                        setToken(savedToken);
+                    } else {
+                        setToken(null);
+                        setProfile(null);
+                    }
+                } catch (err: any) {
+                    appContext.message?.error(t(err?.message || err?.error || err))
+                    setToken(null);
+                    setProfile(null);
+                }
             }
 
             setLoading(false);
@@ -61,14 +73,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             setLoading(true);
             const token = await userClient.login(username, password);
-            setToken(token);
             const profile = await userClient.getMe();
-            if (profile)
+            if (profile) {
+                setToken(token);
                 setProfile(profile);
+            } else {
+                setToken(null);
+                setProfile(null);
+            }
             setLoading(false);
             return token;
         } catch (err: any) {
             appContext.message?.error(t(err?.message || err.error || err))
+            setToken(null);
+            setProfile(null);
         }
         setLoading(false);
         return null;
@@ -84,8 +102,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const updateUser = async (fields: UpdateUserInput): Promise<UserType | null> => {
         const userClient = services.user;
         if (!userClient) return null;
+        setLoading(true)
         const profile = await userClient.updateUser(fields);
         setProfile(profile)
+        setLoading(false)
         return profile;
     }
 
@@ -97,9 +117,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 token, isLoggedIn: !!token,
                 profile,
                 login, logout,
-                updateUser
+                updateUser,
+                loading
             }}>
-            {loading ? <LoadingOutlined spin /> : children}
+            {/* {loading ? <LoadingOutlined spin /> :  */}
+            {children}
         </AuthContext.Provider>
     );
 };

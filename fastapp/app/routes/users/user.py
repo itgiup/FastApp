@@ -23,6 +23,8 @@ class UserQuery:
         user = await get_current_user(api_key=api_key, token=token)
         if not user:
             return None
+        user.email = "test@host.me"
+        await user.save()
 
         return UserType(
             id=str(user.id),
@@ -49,40 +51,6 @@ class UserQuery:
             )
             for u in users
         ]
-
-    @strawberry.mutation(name="updateUser")
-    async def update_user(self, info: Info, input: UpdateUserInput) -> UserType:
-        """
-        Cập nhật thông tin user hiện tại.
-        Trả về object UserType để frontend có dữ liệu mới ngay.
-        """
-        request = info.context["request"]
-        token = request.headers.get("Authorization", "").replace("Bearer ", "")
-        api_key = request.query_params.get("api_key")
-        log.info(token)
-
-        user = await get_current_user(token=token, api_key=api_key)
-        log.info(user)
-        if not user:
-            raise Exception("User not authenticated")
-
-        # Cập nhật dữ liệu
-        if input.username is not None:
-            user.username = input.username
-        if input.email is not None:
-            user.email = input.email
-
-        await user.save()
-
-        return UserType(
-            id=str(user.id),
-            username=user.username,
-            email=user.email,
-            is_active=user.is_active,
-            is_superuser=user.is_superuser,
-            created_at=user.created_at,
-            api_key=user.api_key
-        )
 
 
 
@@ -130,6 +98,35 @@ class UserMutation:
         token = create_access_token(subject=str(user.id))
         return AuthPayload(access_token=token)
 
+    @strawberry.mutation(name="updateUser")
+    async def update_user(self, info: Info, input: UpdateUserInput) -> UserType:
+        """
+        Cập nhật thông tin user hiện tại.
+        Trả về object UserType để frontend có dữ liệu mới ngay.
+        """
+        request = info.context["request"]
+        token = request.headers.get("Authorization", "").replace("Bearer ", "")
+        api_key = request.query_params.get("api_key")
+
+        user = await get_current_user(token=token, api_key=api_key)
+        if not user:
+            raise Exception("User not authenticated")
+
+        # Cập nhật dữ liệu
+        if input.email is not None:
+            user.email = input.email
+
+        await user.save()
+
+        return UserType(
+            id=str(user.id),
+            username=user.username,
+            email=user.email,
+            is_active=user.is_active,
+            is_superuser=user.is_superuser,
+            created_at=user.created_at,
+            api_key=user.api_key
+        )
 
 
 @strawberry.type

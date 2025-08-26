@@ -73,5 +73,4 @@ class UserType:
 
 @strawberry.input
 class UpdateUserInput:
-    username: Optional[str] = None
     email: Optional[str] = None

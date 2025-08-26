@@ -5,8 +5,8 @@ services:
     image: mongo
     volumes:
       - ./data/mongo:/data/db
-    ports:
-      - 27017:27017
+    # ports:
+    #   - 27017:27017
     restart: always
 
   qdrant:
@@ -54,7 +54,7 @@ services:
   ui:
     image: nginx
     ports:
-      - "80:80"
+      - "81:80"
     volumes:
       - ./ui/dist:/usr/share/nginx/html:ro
       - ./ui/dist/certs:/etc/nginx/certs:ro

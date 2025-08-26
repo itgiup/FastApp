@@ -1,4 +1,5 @@
-import type { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
+import { z } from 'zod';
 
 export type LoginState = "LOGGED_OUT" | "LOGGED_IN" | "EXPIRED";
 
@@ -28,6 +29,22 @@ export interface UserType {
     apiKey?: string
 }
 
+// export const UserTypeSchema = z.object({
+//     id: z.string(),
+//     username: z.string(),
+//     email: z.email(),
+//     isActive: z.boolean(),
+//     isSuperuser: z.boolean(),
+//     createdAt: z.instanceof(Dayjs),
+//     apiKey: z.string().optional(),
+// });
+
+
 export interface UpdateUserInput {
     email?: string
 }
+
+
+export const UpdateUserInputSchema = z.object({
+    email: z.email(),
+}); 

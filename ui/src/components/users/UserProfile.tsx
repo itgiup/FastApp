@@ -1,11 +1,11 @@
-import { type FC, useState } from "react";
-import { Card, Typography, Spin, Alert, Button, Flex, } from "antd";
+import { type FC } from "react";
+import { Card, Typography, Spin, Alert, Button, Flex, Form, } from "antd";
 import { CheckCircleOutlined, CheckCircleTwoTone, LogoutOutlined } from '@ant-design/icons';
 import { useTranslation } from "react-i18next";
 import { useAuth } from "./AuthContext";
 import { DAYTIMEFORMAT } from "../../utils/time";
 import { appContext } from "../../services";
-import type { UpdateUserInput } from "../../schemas/user";
+import { UpdateUserInputSchema, type UpdateUserInput } from "../../schemas/user";
 
 const { Text } = Typography;
 
@@ -17,18 +17,25 @@ const uncheckedIcon = <CheckCircleOutlined />
 
 export const UserProfile: FC<Props> = () => {
     const { t } = useTranslation();
-    const { isLoggedIn, profile, logout, userClient, updateUser } = useAuth()
+    const { isLoggedIn, profile, logout, userClient, updateUser, loading } = useAuth();
+
 
     if (!isLoggedIn) return <Alert type="warning" message={t("Please login to access")} showIcon />;
-
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     const updateField = async (field: keyof UpdateUserInput, value: string) => {
         try {
             if (!profile || !userClient) return;
             const variables = { email: profile.email };
             variables[field] = value;
+
+            // kiểm tra hợp lệ
+            const validate = UpdateUserInputSchema.safeParse(variables)
+            console.log(validate);
+            if (validate.error) {
+                appContext.message?.error(t(validate.error.message));
+                return;
+            }
+            return;
 
             const user = await updateUser(variables);
             if (user) {
@@ -40,7 +47,6 @@ export const UserProfile: FC<Props> = () => {
         }
     };
 
-    if (error) return <Alert type="error" message={error} style={{ margin: "20px" }} />;
     if (!profile) return <Alert type="warning" message={t("user.notLoggedIn")} style={{ margin: "20px" }} />;
 
     return (
@@ -54,19 +60,22 @@ export const UserProfile: FC<Props> = () => {
 
             <p>
                 <i className="small-info">{t("user.email")}:</i>{" "}
-                <Text
-                    editable={{
-                        onChange: (val) => updateField("email", val),
-                    }}
-                >
-                    {profile.email}
-                </Text>
+                <Form.Item rules={[{ type: 'email' }]}>
+                    <Text
+                        editable={{
+                            onChange: (val) => updateField("email", val),
+                        }}
+                    >
+                        {profile.email}
+                    </Text>
+                </Form.Item>
             </p>
 
             <p><i className="small-info">{t("user.id")}:</i> {profile.id}</p>
             <p><i className="small-info">{t("user.active")}:</i> {profile.isActive ? checkedIcon : uncheckedIcon}</p>
             <p><i className="small-info">{t("user.admin")}:</i> {profile.isSuperuser ? checkedIcon : uncheckedIcon}</p>
             <p><i className="small-info">{profile.createdAt.format(DAYTIMEFORMAT)}</i></p>
+            {loading && <Spin spinning />}
             <Flex justify="end">
                 <Button danger icon={<LogoutOutlined />} onClick={logout}>{t("Logout")}</Button>
             </Flex>
