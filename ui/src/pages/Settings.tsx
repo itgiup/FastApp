@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FC, type FormEventHandler, useEffect, useState, } from 'react';
+import { type ChangeEvent, type FC, useEffect, useState, } from 'react';
 import * as appStore from '../store/app';
 import { useStoreDispatch, useStore } from '../store/hooks';
 import { Layout, Button, Popconfirm, Flex, Switch, Dropdown, Space, Input, Form } from 'antd';
@@ -24,16 +24,17 @@ const languagesMenu: MenuProps['items'] = languages.map(({ lang, name: label, co
 const Settings: FC = () => {
     const dispatch = useStoreDispatch();
     const appSettings = useStore((state) => state.app);
-    const [_, setRenderCount] = useState(0);
-    const reRender = () => setRenderCount(pre => pre + 1);
+    // const [_, setRenderCount] = useState(0);
+    // const reRender = () => setRenderCount(pre => pre + 1);
     const { t } = useTranslation();
 
     const [form] = Form.useForm();
     // const formValues = Form.useWatch([], form);
 
     const [funcs] = useState({
-        onPaste: (text: string) => {
-            's';
+        onPaste: (name: string, value: string) => {
+            console.log(name, value);
+            dispatch(appStore.change({ [name]: value }))
         },
 
         onChangeApiUrl: (e: ChangeEvent<HTMLInputElement>) => {
@@ -48,8 +49,6 @@ const Settings: FC = () => {
     })
 
     useEffect(() => {
-        console.log(appSettings);
-
         form.setFieldsValue({
             apiUrl: appSettings.apiUrl,
             apiWsUrl: appSettings.apiWsUrl,
@@ -115,7 +114,7 @@ const Settings: FC = () => {
                 <Form.Item label='api url' name={'apiUrl'}>
                     <Input placeholder='api url' name={'apiUrl'}
                         suffix={<BtnCopy value={appSettings.apiUrl} />}
-                        prefix={<BtnPaste onPaste={funcs.onPaste} />}
+                        prefix={<BtnPaste onPaste={funcs.onPaste} name={'apiUrl'} />}
                         // value={appSettings.apiUrl}
                         onChange={funcs.onChangeApiUrl}
                     />
@@ -124,7 +123,7 @@ const Settings: FC = () => {
                 <Form.Item label='api url websocket' name={'apiWsUrl'}>
                     <Input placeholder='api url websocket' name={'apiWsUrl'}
                         suffix={<BtnCopy value={appSettings.apiWsUrl} />}
-                        prefix={<BtnPaste onPaste={funcs.onPaste} />}
+                        prefix={<BtnPaste onPaste={funcs.onPaste} name={'apiWsUrl'} />}
                         // value={appSettings.apiWsUrl}
                         onChange={funcs.onChangeApiWsUrl}
                     />

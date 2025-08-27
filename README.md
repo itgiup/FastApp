@@ -13,6 +13,8 @@
 - strawberry graphQL
 
 #### run:
+- edit file `fastapp/.env`
+
 ```bash
 uv run main.py
 ```
@@ -27,14 +29,15 @@ uv run main.py
 - react redux
 
 #### run:
+- proxy: `ui/vite.config.ts`
+
 ```bash
 yarn dev
 yarn build
 ```
 
 # nginx: 
-- ui/public/nginx.conf: 
-nginx config proxy routes
+- `ui/public/nginx.conf` is nginx config proxy routes
 
 
 # Docker compose
