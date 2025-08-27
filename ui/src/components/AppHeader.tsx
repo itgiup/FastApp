@@ -57,6 +57,7 @@ export const AppHeader = () => {
             language: value
         }));
     };
+
     const changeTheme = (checked: boolean) => {
         // Dispatch the change to the store
         dispatch(appStore.change({
@@ -69,7 +70,6 @@ export const AppHeader = () => {
             });
         });
     };
-
 
     const menuItems: MenuItem[] = [
         // generate-wallets
@@ -98,7 +98,6 @@ export const AppHeader = () => {
             label: <Link to='/settings' >{t('menu.settings')}</Link>,
         },
     ];
-
 
     return (
 
@@ -155,6 +154,7 @@ export const AppHeader = () => {
                     }}>
                         <a>
                             <Space>
+                                <img src="/images/language.png" alt="Language" style={{ width: '1em', height: '1em' }} />
                                 {languages.find(l => l.lang === appSettings.language)?.name || t('Select Language')}
                                 <DownOutlined />
                             </Space>
@@ -192,6 +192,7 @@ export const AppHeader = () => {
                     }}>
                         <a>
                             <Space>
+                                <img src="/images/language.png" alt="Language" style={{ width: '1em', height: '1em' }} />
                                 {languages.find(l => l.lang === appSettings.language)?.name || t('Select Language')}
                                 <DownOutlined />
                             </Space>
