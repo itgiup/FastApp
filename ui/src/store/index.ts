@@ -1,7 +1,7 @@
 import { configureStore, combineReducers, type Dispatch } from "@reduxjs/toolkit";
 
-import app from "./app";
-import user from "./user";
+import app, { load as loadApp } from "./app";
+import user, { load as loadUser } from "./user";
 import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 const { } = console;
@@ -45,4 +45,10 @@ export type AsyncThunkConfig = {
     rejectedMeta?: unknown,
     getState: () => any,
     [name: string]: any,
+}
+
+/** load all store saved  */
+export async function loadStore() {
+    await store.dispatch(loadApp());
+    await store.dispatch(loadUser());
 }

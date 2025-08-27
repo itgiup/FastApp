@@ -4,6 +4,7 @@ import { getMainDefinition } from "@apollo/client/utilities";
 import { createClient } from "graphql-ws";
 
 export function createGQLClient(httpUri: string, wsUri: string) {
+    console.log(httpUri, wsUri);
 
     const httpLink = new HttpLink({
         uri: httpUri,

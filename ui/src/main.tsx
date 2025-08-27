@@ -2,7 +2,7 @@ import { StrictMode, Suspense, } from 'react'
 import { Provider } from 'react-redux';
 import { createRoot } from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import store from './store/index.ts';
+import store, { loadStore } from './store/index.ts';
 
 import './index.scss'
 import App from './App.tsx'
@@ -26,6 +26,7 @@ import DashboardUsers from './pages/dashboard/DashboardUsers.tsx';
 import DashboardAnalytics from './pages/dashboard/DashboardAnalytics.tsx';
 import ProtectedRouteSuper from './components/users/ProtectedRouteSuper.tsx';
 import SignupPage from './pages/users/Signup.tsx';
+import { startServices } from './services/index.ts';
 
 
 
@@ -126,7 +127,11 @@ const router = createBrowserRouter([{
   ]
 }]);
 
-
+async function startup() {
+  await loadStore()
+  await startServices()
+}
+startup()
 
 createRoot(document.getElementById('root')!).render(
   <Suspense fallback={<Loading />}>

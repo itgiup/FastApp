@@ -1,18 +1,15 @@
-import { type FC, useState, useEffect, useRef } from 'react'
+import { type FC, useState, useEffect } from 'react'
 import { Outlet, } from "react-router-dom";
-import { useStoreDispatch, useStore } from "./store/hooks";
+import { useStore } from "./store/hooks";
 import {
   Col, ConfigProvider,
   Layout, message, notification, Row, theme,
 } from 'antd';
-import * as appStore from './store/app';
 import i18n from './services/i18n';
 import './App.scss'
 
 import 'flag-icon-css/css/flag-icons.min.css';
-import { appContext, startServices } from './services';
-import { Loading } from './components/Loading';
-import { createGQLClient } from './services/graphQLClient';
+import { appContext } from './services';
 import AppHeader from './components/AppHeader';
 import Donations from './components/Donations';
 import { useAuth } from './components/users/AuthContext';
@@ -21,18 +18,11 @@ const { Content, Footer } = Layout;
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
 
-
 const App: FC = () => {
-  const dispatch = useStoreDispatch();
   const appSettings = useStore((state) => state.app);
-  const mounted = useRef(false);
   const [_, setRenderCount] = useState(0);
   const reRender = () => setRenderCount(pre => pre + 1);
-  const [loading, setLoading] = useState(true);
-  const [states] = useState<{ appSettings: appStore.InitialType }>({ appSettings });
-  // states.appSettings = appSettings;
-  const { isAuthenticated, isLoggedIn, profile } = useAuth()
-
+  const { isLoggedIn, profile } = useAuth()
 
   const [messageApi, messageApiHolder] = message.useMessage();
   const [notificationApi, notificationApiHolder] = notification.useNotification();
@@ -42,32 +32,6 @@ const App: FC = () => {
     appContext.notification = notificationApi;
   }, [messageApi, notificationApi])
 
-  /** load store  */
-  async function loadStore() {
-    await dispatch(appStore.load());
-  }
-
-  // didmount effect to load initial settings
-  useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-
-      loadStore()
-        .then(() => {
-          setLoading(false);
-          const GQLClient = createGQLClient(states.appSettings.apiUrl, states.appSettings.apiWsUrl);
-          appContext.graphQLClient = GQLClient;
-
-          /** chạy service  */
-          startServices(isAuthenticated, reRender);
-        })
-        .catch((err: any) => {
-          console.error(err)
-        });
-      return () => { }
-    }
-    mounted.current = true;
-  }, []);
 
   useEffect(() => {
     reRender();
@@ -87,7 +51,6 @@ const App: FC = () => {
     document.title = appSettings.title;
   }, [appSettings.title]);
 
-  if (loading) return <Loading />;
 
   return (
     <ConfigProvider

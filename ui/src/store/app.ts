@@ -26,7 +26,7 @@ export type InitialType = {
     apiWsUrl: string;
 }
 
-const { protocol, host, hostname, } = document.location;
+const { protocol, host, } = document.location;
 
 export const initialState: InitialType = {
     author: "author",
