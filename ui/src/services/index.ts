@@ -21,8 +21,16 @@ export const services: {
     user: null
 }
 
-export function startServices() {
+export function startServices(...callbacks: (() => void)[]) {
     if (!appContext.graphQLClient) throw new Error("appContext.graphQLClient has not initiated");
 
-    services.user = new UserClient(appContext.graphQLClient)
+    services.user = new UserClient(appContext.graphQLClient);
+
+    // Execute each callback function
+    callbacks.forEach(callback => {
+        // Ensure the element is actually a function before calling it
+        if (typeof callback === 'function') {
+            callback();
+        }
+    });
 }

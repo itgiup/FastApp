@@ -1,27 +1,20 @@
-import { type FC, useRef, useEffect, useState } from 'react';
-import { Flex, Layout } from 'antd';
+import { type FC, useRef, useEffect } from 'react';
+import { Layout } from 'antd';
 import { Helmet } from "react-helmet";
 
-import { useStoreDispatch, useStore } from "../store/hooks";
-import * as appStore from '../store/app';
+import { useStore } from "../store/hooks";
 import Wallets from '../components/Wallets';
 import { useTranslation } from 'react-i18next';
 
 const { Content } = Layout;
 
 const Home: FC = () => {
-
-    const dispatch = useStoreDispatch();
     const appSettings = useStore((state) => state.app);
-    const [renderCount, setRenderCount] = useState(0);
+    // const [renderCount, setRenderCount] = useState(0);
+    // const reRender = () => setRenderCount(pre => pre + 1);
     const mounted = useRef(false);
     const { t } = useTranslation();
 
-
-
-    function reRender() {
-        setRenderCount(pre => pre + 1);
-    }
 
     // didmount effect to load initial settings
     useEffect(() => {

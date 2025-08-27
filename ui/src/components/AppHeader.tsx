@@ -9,6 +9,7 @@ import { useAppDispatch } from "../store";
 import * as appStore from "../store/app";
 import { appContext } from "../services";
 import { User } from "./users";
+import { useAuth } from "./users/AuthContext";
 
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -32,10 +33,14 @@ export const AppHeader = () => {
     const { t } = useTranslation();
     const [drawerVisible, setDrawerVisible] = useState(false);
     const screens = useBreakpoint();
+    // const [_, setRenderCount] = useState(0);
+    // const reRender = () => setRenderCount(pre => pre + 1);
 
     const navigate = useNavigate();
     const location = useLocation();
     const [current, setCurrent] = useState<string>(location.pathname);
+    const selectedKeys = [location.pathname.substring(1) || 'home'];
+    const { isLoggedIn } = useAuth()
 
     // khi current thay đổi thì route tới đó 
     useEffect(() => {
@@ -74,27 +79,27 @@ export const AppHeader = () => {
     const menuItems: MenuItem[] = [
         // generate-wallets
         {
-            key: '/generate-wallets',
+            key: 'generate-wallets',
             label: t('menu.Generate wallets'),
             children: [
                 {
-                    key: '/generate-wallets/tron',
+                    key: 'generate-wallets/tron',
                     label: <Link to="/generate-wallets/tron">Tron (TRX)</Link>,
                 },
                 {
-                    key: '/generate-wallets/icp',
+                    key: 'generate-wallets/icp',
                     label: <Link to="/generate-wallets/icp">Internet Computer (ICP)</Link>,
                 },
             ]
         },
         // about
         {
-            key: '/about',
+            key: 'about',
             label: <Link to='/about' >{t('menu.about')}</Link>,
         },
         // settings
         {
-            key: '/settings',
+            key: 'settings',
             label: <Link to='/settings' >{t('menu.settings')}</Link>,
         },
     ];
@@ -119,7 +124,7 @@ export const AppHeader = () => {
                     {/* Desktop menu */}
                     {screens.md && (
                         <div className="desktop-menu">
-                            <Menu mode="horizontal" items={menuItems} />
+                            <Menu mode="horizontal" items={menuItems} selectedKeys={selectedKeys} />
                         </div>
                     )}
 
@@ -134,10 +139,13 @@ export const AppHeader = () => {
                 {/* Bên phải (Actions) */}
                 <Flex align="center" gap={'small'}>
 
-                    <Popover content={<>
-                        <User />
-                    </>}
-                    ><a><UserOutlined /></a></Popover>
+                    <Popover
+                        content={<>
+                            <User />
+                        </>}
+                    >
+                        <Link to={'/user'}><UserOutlined style={{ color: isLoggedIn ? 'green' : 'auto' }} /></Link>
+                    </Popover>
 
                     <Switch
                         checked={appSettings.theme === 'dark'}
@@ -174,6 +182,7 @@ export const AppHeader = () => {
                     style={{ width: '100%' }}
                     mode="inline"
                     items={menuItems}
+                    selectedKeys={selectedKeys}
                 />
                 <br />
                 <Flex gap={'small'}>
@@ -199,10 +208,11 @@ export const AppHeader = () => {
                         </a>
                     </Dropdown>
 
-                    <Popover content={<>
-                        <User />
-                    </>}
-                    ><a><UserOutlined /></a></Popover>
+                    <Popover
+                        content={<>
+                            <User />
+                        </>}
+                    ><a><UserOutlined style={{ color: isLoggedIn ? 'green' : 'auto' }} /></a></Popover>
                 </Flex>
             </Drawer>
         </Header>

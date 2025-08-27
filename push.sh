@@ -2,6 +2,6 @@
 
 
 git add .
-git commit -m "Tạo thành công dashboard "
+git commit -m "Đăng nhập thành công, update thành công user"
 git push
 

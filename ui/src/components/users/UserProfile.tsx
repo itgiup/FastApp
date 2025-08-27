@@ -6,6 +6,7 @@ import { useAuth } from "./AuthContext";
 import { DAYTIMEFORMAT } from "../../utils/time";
 import { appContext } from "../../services";
 import { UpdateUserInputSchema, type UpdateUserInput } from "../../schemas/user";
+import { z } from "zod";
 
 const { Text } = Typography;
 
@@ -19,7 +20,6 @@ export const UserProfile: FC<Props> = () => {
     const { t } = useTranslation();
     const { isLoggedIn, profile, logout, userClient, updateUser, loading } = useAuth();
 
-
     if (!isLoggedIn) return <Alert type="warning" message={t("Please login to access")} showIcon />;
 
     const updateField = async (field: keyof UpdateUserInput, value: string) => {
@@ -30,12 +30,23 @@ export const UserProfile: FC<Props> = () => {
 
             // kiểm tra hợp lệ
             const validate = UpdateUserInputSchema.safeParse(variables)
-            console.log(validate);
             if (validate.error) {
-                appContext.message?.error(t(validate.error.message));
+                const { properties } = z.treeifyError(validate.error);
+                if (properties)
+                    Object.entries(properties).forEach(([key, values]) => {
+                        if (values.errors.length === 0) return;
+                        if (values.errors.length === 1) {
+                            appContext.message?.error(`${key}: ${values.errors[0]}`);
+                        } else {
+                            const _errors = values.errors.map(err => <div>{err}</div>)
+                            appContext.notification?.error({
+                                message: key,
+                                description: _errors
+                            });
+                        }
+                    })
                 return;
             }
-            return;
 
             const user = await updateUser(variables);
             if (user) {
@@ -51,14 +62,14 @@ export const UserProfile: FC<Props> = () => {
 
     return (
         <Card>
-            <p>
+            <div>
                 <i className="small-info">{t("user.username")}:</i>{" "}
                 <Text>
                     {profile.username}
                 </Text>
-            </p>
+            </div>
 
-            <p>
+            <div>
                 <i className="small-info">{t("user.email")}:</i>{" "}
                 <Form.Item rules={[{ type: 'email' }]}>
                     <Text
@@ -69,12 +80,12 @@ export const UserProfile: FC<Props> = () => {
                         {profile.email}
                     </Text>
                 </Form.Item>
-            </p>
+            </div>
 
-            <p><i className="small-info">{t("user.id")}:</i> {profile.id}</p>
-            <p><i className="small-info">{t("user.active")}:</i> {profile.isActive ? checkedIcon : uncheckedIcon}</p>
-            <p><i className="small-info">{t("user.admin")}:</i> {profile.isSuperuser ? checkedIcon : uncheckedIcon}</p>
-            <p><i className="small-info">{profile.createdAt.format(DAYTIMEFORMAT)}</i></p>
+            <div><i className="small-info">{t("user.id")}:</i> {profile.id}</div>
+            <div><i className="small-info">{t("user.active")}:</i> {profile.isActive ? checkedIcon : uncheckedIcon}</div>
+            <div><i className="small-info">{t("user.admin")}:</i> {profile.isSuperuser ? checkedIcon : uncheckedIcon}</div>
+            <div><i className="small-info">{profile.createdAt.format(DAYTIMEFORMAT)}</i></div>
             {loading && <Spin spinning />}
             <Flex justify="end">
                 <Button danger icon={<LogoutOutlined />} onClick={logout}>{t("Logout")}</Button>

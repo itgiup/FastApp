@@ -15,6 +15,7 @@ import { Loading } from './components/Loading';
 import { createGQLClient } from './services/graphQLClient';
 import AppHeader from './components/AppHeader';
 import Donations from './components/Donations';
+import { useAuth } from './components/users/AuthContext';
 
 const { Content, Footer } = Layout;
 const { defaultAlgorithm, darkAlgorithm } = theme;
@@ -26,28 +27,25 @@ const App: FC = () => {
   const appSettings = useStore((state) => state.app);
   const mounted = useRef(false);
   const [_, setRenderCount] = useState(0);
-  // const reRender = () => setRenderCount(pre => pre + 1);
+  const reRender = () => setRenderCount(pre => pre + 1);
   const [loading, setLoading] = useState(true);
   const [states] = useState<{ appSettings: appStore.InitialType }>({ appSettings });
   // states.appSettings = appSettings;
+  const { isAuthenticated, isLoggedIn, profile } = useAuth()
 
 
   const [messageApi, messageApiHolder] = message.useMessage();
   const [notificationApi, notificationApiHolder] = notification.useNotification();
-
 
   useEffect(() => {
     appContext.message = messageApi;
     appContext.notification = notificationApi;
   }, [messageApi, notificationApi])
 
-
   /** load store  */
   async function loadStore() {
     await dispatch(appStore.load());
   }
-
-
 
   // didmount effect to load initial settings
   useEffect(() => {
@@ -61,7 +59,7 @@ const App: FC = () => {
           appContext.graphQLClient = GQLClient;
 
           /** chạy service  */
-          startServices();
+          startServices(isAuthenticated, reRender);
         })
         .catch((err: any) => {
           console.error(err)
@@ -70,6 +68,10 @@ const App: FC = () => {
     }
     mounted.current = true;
   }, []);
+
+  useEffect(() => {
+    reRender();
+  }, [isLoggedIn, profile])
 
   useEffect(() => {
     i18n.changeLanguage(appSettings.language)
@@ -85,8 +87,6 @@ const App: FC = () => {
     document.title = appSettings.title;
   }, [appSettings.title]);
 
-
-
   if (loading) return <Loading />;
 
   return (
@@ -96,11 +96,11 @@ const App: FC = () => {
           appSettings.theme === 'dark' ? darkAlgorithm : defaultAlgorithm
         ],
       }}>
-      <Layout style={{ minHeight: window.innerHeight * 0.98 }}>
+      <Layout style={{ minHeight: window.innerHeight * 0.98, }}>
         <AppHeader />
 
 
-        <Content style={{ padding: '10px' }}>
+        <Content style={{ paddingLeft: 10, paddingRight: 10 }}>
           <Outlet />
         </Content>
 

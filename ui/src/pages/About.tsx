@@ -1,20 +1,11 @@
-import { type FC, useRef, useEffect, useState } from 'react';
-import { useStoreDispatch, useStore } from "../store/hooks";
-import * as appStore from '../store/app';
 import { Trans, useTranslation } from 'react-i18next';
 import { contact } from '../store/contact';
 
 
-
-
 const About: React.FC = () => {
-    const appSettings = useStore((state) => state.app);
-    const [renderCount, setRenderCount] = useState(0);
+    // const [renderCount, setRenderCount] = useState(0);
+    // const reRender = () => setRenderCount(pre => pre + 1);
     const { t } = useTranslation();
-    function reRender() {
-        setRenderCount(pre => pre + 1);
-    }
-
 
     // Set the document title
     if (typeof document !== 'undefined') {

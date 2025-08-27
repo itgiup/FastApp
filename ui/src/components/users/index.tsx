@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert } from "antd";
 
@@ -14,13 +14,18 @@ export const User: FC<Props> = ({ }) => {
     const { t } = useTranslation();
     const { isLoggedIn, userClient } = useAuth()
 
-    if (!userClient) {
-        return <Alert type="warning" message={t(UserErrors.UserClientHasNotInitiated)} showIcon />;
-    }
+    const [content, setContent] = useState(<Alert type="warning" message={t(UserErrors.UserClientHasNotInitiated)} showIcon />)
 
-    if (isLoggedIn) {
-        return <UserProfile />
-    }
+    useEffect(() => {
+        if (!userClient) {
+            setContent(<Alert type="warning" message={t(UserErrors.UserClientHasNotInitiated)} showIcon />);
+        } else
+            if (isLoggedIn) {
+                setContent(<UserProfile />)
+            } else
+                setContent(<LoginForm />)
+    }, [isLoggedIn])
 
-    return <LoginForm />
+
+    return content
 }

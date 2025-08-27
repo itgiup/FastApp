@@ -9,13 +9,14 @@ import { useTranslation } from "react-i18next";
 import type { UserType, UpdateUserInput } from "../../schemas/user";
 import { appContext, services } from "../../services";
 import type { UserClient } from "../../services/user";
-import { boolean } from "zod";
+
 type AuthContextType = {
     token: string | null;
     isLoggedIn: boolean;
     profile: UserType | null;
     isSuper: boolean;
     userClient: UserClient | null
+    isAuthenticated: () => Promise<void>
     login: (username: string, password: string) => Promise<string | null>;
     logout: () => void;
     updateUser: (fields: UpdateUserInput) => Promise<UserType | null>;
@@ -31,43 +32,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState(true); // loading khi khởi động
     const [profile, setProfile] = useState<UserType | null>(null);
     const [isSuper, setIsSuper] = useState(false);
-    const [userClient, setUserClient] = useState(services.user);
 
     // khi mount, kiểm tra client + token
     useEffect(() => {
+        isAuthenticated();
+    }, [services.user]);
+
+    const isAuthenticated = async () => {
         const userClient = services.user;
-        setUserClient(userClient);
-        (async () => {
-            if (!userClient) {
-                // client chưa khởi tạo
-                setLoading(false);
-                return;
-            }
-            const isAuthenticated = userClient.isAuthenticated();
-            if (!isAuthenticated) {
-                setToken(null);
-            } else {
-                try {
-                    setLoading(true)
-                    const savedToken = userClient.getToken();
-                    const profile = await userClient.getMe();
-                    if (profile) {
-                        setProfile(profile);
-                        setToken(savedToken);
-                    } else {
-                        setToken(null);
-                        setProfile(null);
-                    }
-                } catch (err: any) {
-                    appContext.message?.error(t(err?.message || err?.error || err))
+        if (!userClient) {
+            // client chưa khởi tạo
+            setLoading(false);
+            return;
+        }
+        const isAuthenticated = userClient.isAuthenticated();
+
+        if (!isAuthenticated) {
+            setToken(null);
+        } else {
+            try {
+                setLoading(true)
+                const savedToken = userClient.getToken();
+                const profile = await userClient.getMe();
+                if (profile) {
+                    setProfile(profile);
+                    setToken(savedToken);
+                } else {
                     setToken(null);
                     setProfile(null);
                 }
+            } catch (err: any) {
+                appContext.message?.error(t(err?.message || err?.error || err))
+                setToken(null);
+                setProfile(null);
             }
+        }
 
-            setLoading(false);
-        })();
-    }, [services.user]);
+        setLoading(false);
+    }
 
     const login = async (username: string, password: string): Promise<string | null> => {
         const userClient = services.user;
@@ -119,10 +121,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <AuthContext.Provider
             value={{
-                userClient,
+                userClient: services.user,
                 token, isLoggedIn: !!token,
                 profile,
                 isSuper,
+                isAuthenticated,
                 login, logout,
                 updateUser,
                 loading

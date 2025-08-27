@@ -23,7 +23,6 @@ class UserQuery:
         user = await get_current_user(api_key=api_key, token=token)
         if not user:
             return None
-        user.email = "test@host.me"
         await user.save()
 
         return UserType(

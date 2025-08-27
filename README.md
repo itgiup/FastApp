@@ -32,6 +32,11 @@ yarn dev
 yarn build
 ```
 
+# nginx: 
+- ui/public/nginx.conf: 
+nginx config proxy routes
+
+
 # Docker compose
 #### run:
 ```bash

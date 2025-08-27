@@ -19,7 +19,8 @@ export class UserClient {
     }
 
     public getToken(): string | null {
-        return localStorage.getItem(this.tokenKey);
+        const token = localStorage.getItem(this.tokenKey);
+        return token;
     }
 
     /** Kiểm tra token còn hạn không */
@@ -136,7 +137,6 @@ export class UserClient {
                 variables: input,
                 context: { headers: { Authorization: `Bearer ${token}` } },
             });
-            console.log(res);
             const me = res?.data?.updateUser;
             if (me) {
                 const newMe = { ...me, createdAt: dayjs(me.createdAt) };

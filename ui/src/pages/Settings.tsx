@@ -80,13 +80,13 @@ const Settings: FC = () => {
         document.title = t('Settings');
     }
 
-    return (<Content>
+    return (<Content style={{ paddingLeft: '1em', paddingRight: '1em' }}>
         <Flex align='start' vertical gap={'small'}>
             <h1>{t("Settings")}</h1>
 
             <Form form={form}>
                 <Space>
-                    <Form.Item label='api url'>
+                    <Form.Item>
                         {/* theme */}
                         <Switch
                             checked={appSettings.theme === 'dark'}
