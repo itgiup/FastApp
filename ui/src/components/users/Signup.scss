@@ -1,0 +1,79 @@
+.register-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.register-card .ant-card-body {
+    padding: 40px;
+}
+
+.title-section {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.title-section h2 {
+    color: #1890ff;
+    margin-bottom: 8px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.web3-note {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f0f9ff;
+    border-radius: 8px;
+    border: 1px solid #e6f7ff;
+}
+
+.web3-note span {
+    font-size: 12px;
+    color: #666;
+}
+
+.ant-form-item-label>label {
+    font-weight: 500;
+}
+
+.ant-input,
+.ant-input-password {
+    border-radius: 8px;
+    height: 48px;
+}
+
+.ant-btn {
+    border-radius: 8px;
+    height: 48px;
+    font-weight: 500;
+}
+
+.web3-button {
+    border-color: #1890ff !important;
+    color: #1890ff !important;
+}
+
+.web3-success-btn {
+    background: #52c41a !important;
+    border-color: #52c41a !important;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.wallet-info {
+    word-break: break-all;
+}

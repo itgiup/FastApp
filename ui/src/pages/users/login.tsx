@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { LoginForm } from "../../components/users/LoginForm";
 import { Typography, Flex } from "antd";
 import { useAuth } from "../../components/users/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const { Title } = Typography
@@ -25,6 +25,10 @@ export default function LoginPage() {
         <Flex vertical align="center">
             <Title level={3}>{t("Login")} </Title>
             <LoginForm />
+            <br />
+            <Link to='/user/signup'>
+                Signup
+            </Link>
         </Flex>
     );
 }

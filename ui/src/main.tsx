@@ -25,6 +25,7 @@ import DashboardOverview from './pages/dashboard/DashboardOverview.tsx';
 import DashboardUsers from './pages/dashboard/DashboardUsers.tsx';
 import DashboardAnalytics from './pages/dashboard/DashboardAnalytics.tsx';
 import ProtectedRouteSuper from './components/users/ProtectedRouteSuper.tsx';
+import SignupPage from './pages/users/Signup.tsx';
 
 
 
@@ -68,6 +69,10 @@ const router = createBrowserRouter([{
         {
           path: "login",
           element: <LoginPage />,
+        },
+        {
+          path: "signup",
+          element: <SignupPage />,
         },
         {
           element: <ProtectedRoute />, // bảo vệ các route dưới đây
